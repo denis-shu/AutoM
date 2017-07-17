@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="bb316f5cde184ac09ebb3657445bbcbf" Name="Diagram1" ZoomLevel="87">
+        <EntityTypeShape EntityType="AutomateDatabaseModel.C__MigrationHistory" Width="1.5" PointX="0.75" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="AutomateDatabaseModel.Characteristic" Width="1.5" PointX="12" PointY="1.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="AutomateDatabaseModel.Language" Width="1.5" PointX="9.75" PointY="1.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="AutomateDatabaseModel.sysdiagram" Width="1.5" PointX="0.75" PointY="7.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="AutomateDatabaseModel.Tag" Width="1.5" PointX="16.5" PointY="1.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="AutomateDatabaseModel.VisualRepresentation" Width="1.5" PointX="12" PointY="5.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="AutomateDatabaseModel.Author" Width="1.5" PointX="0.75" PointY="3.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="AutomateDatabaseModel.Bookmark" Width="1.5" PointX="7.5" PointY="3.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="AutomateDatabaseModel.Cours" Width="1.5" PointX="3" PointY="3.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="AutomateDatabaseModel.CourseTag" Width="1.5" PointX="5.25" PointY="1.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="AutomateDatabaseModel.Lesson" Width="1.5" PointX="5.25" PointY="4.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="AutomateDatabaseModel.LessonTag" Width="1.5" PointX="7.5" PointY="6.5" IsExpanded="true" />
+        <AssociationConnector Association="AutomateDatabaseModel.LanguageIdKey" ManuallyRouted="false" />
+        <AssociationConnector Association="AutomateDatabaseModel.FK_Courses_Authors" ManuallyRouted="false" />
+        <AssociationConnector Association="AutomateDatabaseModel.FK_Bookmarks_Lessons" ManuallyRouted="false" />
+        <AssociationConnector Association="AutomateDatabaseModel.FK_CourseTags_Courses" ManuallyRouted="false" />
+        <AssociationConnector Association="AutomateDatabaseModel.FK_Lessons_Courses" ManuallyRouted="false" />
+        <AssociationConnector Association="AutomateDatabaseModel.FK_LessonTags_Lessons" ManuallyRouted="false" />
+        <EntityTypeShape EntityType="AutomateDatabaseModel.Subject" Width="1.5" PointX="14.25" PointY="5.125" />
+        <AssociationConnector Association="AutomateDatabaseModel.CharacteristicsIdKey1" />
+        <AssociationConnector Association="AutomateDatabaseModel.SubjectIdKey1" />
+        <AssociationConnector Association="AutomateDatabaseModel.VisualRepresentationIdKey1" />
+        <EntityTypeShape EntityType="AutomateDatabaseModel.Description" Width="1.5" PointX="18.875" PointY="3.625" />
+        <EntityTypeShape EntityType="AutomateDatabaseModel.Property" Width="1.5" PointX="17.375" PointY="5.75" />
+        <AssociationConnector Association="AutomateDatabaseModel.DescriptionIdKey" />
+        <AssociationConnector Association="AutomateDatabaseModel.SubIdKey" />
+        <AssociationConnector Association="AutomateDatabaseModel.VisualIdKey" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

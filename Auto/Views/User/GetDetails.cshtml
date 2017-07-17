@@ -1,0 +1,184 @@
+﻿@model Logs.Models.UserDetailModel
+
+@{
+    ViewBag.Title = "User's Detail";
+}
+
+<div ng-app="logsApp">
+    <div class="container" ng-controller="userCtrl">
+        <div class="col-sm-12">
+            <label class="col-sm-2">Date Of Registration: </label>
+            <div class="col-sm-4">
+                @if (Model.userDetail.DateOfRegistration != null)
+                {
+                    <p>@Model.userDetail.DateOfRegistration</p>
+                }
+                else
+                {
+                    <p>-</p>
+                }
+
+            </div>
+            <label class="col-sm-2">Id пользователя: </label>
+            <div class="col-sm-4">
+                <p>@Model.userDetail.Id</p>
+            </div>
+        </div>
+        <div class="clearfix"></div>
+        <div class="col-sm-12">
+            <label class="col-sm-2">Logins: </label>
+            <div class="col-sm-4">
+                @foreach (var i in @Model.Logins)
+            {
+                    <p class="longText">@i</p>
+                }
+            </div>
+            <label class="col-sm-2">isAutentification: </label>
+            <div class="col-sm-4">
+                <div class="switch">
+                    <div class="switch-circle">
+                        <span class="switch-value" style="display:none">@Model.isAuth</span>
+                        <i class="switch-id" style="display:none">@Model.UserId</i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12">            
+            <div class="message" style="display:none">
+                <hr />
+                <div class="message-content">
+                    <table class="table table-hover">
+                        <thead class="table-thead">
+                            <tr>
+                                <th>Msg Id</th>
+                                <th>Sender&nbsp;Id</th>
+                                <th>Text</th>
+                                <th>Time&nbsp;Stamp</th>
+                                <th>Application</th>
+                                <th>Type</th>
+                            </tr>
+                        </thead>
+                        <tbody class="table-tbody">
+                            <tr ng-repeat="sender in senders">
+                                <td>{{sender.MessageId}}</td>
+                                <td class="longText">{{sender.SenderId}}</td>
+                                <td>{{sender.Text}}</td>
+                                <td>{{sender.TimeStamp| date:"dd/MM/yyyy 'at' h:mma"}}</td>
+                                <td>{{sender.Application}}</td>
+                                <td>{{sender.MessageType}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <hr />
+                </div>
+                <div class="message-footer">
+                    <div class="pages">
+                        <ul ng-if="senderPager.pages.length" class="pagination">
+                            <li ng-class="{disabled:senderPager.currentPage === 1}">
+                                <a ng-click="SetSenderPage(1)">First</a>
+                            </li>
+                            <li ng-class="{disabled:senderPager.currentPage === 1}">
+                                <a ng-click="SetSenderPage(senderPager.currentPage-1)">Previous</a>
+                            </li>
+                            <li ng-repeat="page in senderPager.pages" ng-class="{active:senderPager.currentPage === page}">
+                                <a ng-click="SetSenderPage(page)">{{page}}</a>
+                            </li>
+                            <li ng-class="{disabled:senderPager.currentPage === senderPager.totalPages}">
+                                <a ng-click="SetSenderPage(senderPager.currentPage+1)">Next</a>
+                            </li>
+                            <li ng-class="{disabled:senderPager.currentPage === senderPager.totalPages}">
+                                <a ng-click="SetSenderPage(senderPager.totalPages)">Last</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="clearfix"></div>
+        <hr />
+        <div class="details-nav col-sm-12">
+            <a class="btn btn-info" ng-click="GetMessage(@Model.userDetail.UserId)">{{buttonName}}</a>
+            <a class="btn btn-danger" id="#delete" onclick="deleteUser(@Model.UserId)">Delete User</a>
+            @Html.ActionLink("Back", "Index", null, new { @class = "btn btn-primary" })
+        </div>
+    </div>
+</div>
+<script>
+
+    // switchers
+    function AddSwitcher() {
+        var arr = $(".switch-value");
+        for (var i = 0; i < arr.length; i++) {
+            if ($(arr[i]).text().toLowerCase() == "true") {
+                $(arr[i]).parent().parent().addClass("switch-on");
+            }
+            else
+                $(arr[i]).parent().parent().addClass("switch-off");
+        }
+    };
+
+    AddSwitcher();
+
+    // change switchers
+    $(document).on("click", ".switch", function (e) {
+        bootbox.confirm("Are u sure?", function (result) {
+            if (result) {
+                var temp = $(e.target).find("i").text();
+
+                if ($(e.target).find("div").is(':animated')) {
+                    e.preventDefault();
+                }
+
+                else {
+
+                    if ($(e.target).find("span").text().toLowerCase() == "true") {
+                        $(e.target).find("div").animate({ left: '20px' }, "slow");
+                        $(e.target).removeClass("switch-on").addClass("switch-off");
+                    }
+
+                    else {
+                        $(e.target).find("div").animate({ left: '-2px' }, "slow");
+                        $(e.target).removeClass("switch-off").addClass("switch-on");
+                    }
+
+                    $.ajax({
+                        url: "/User/ChangeAuth/" + temp,
+                        type: "GET",
+                        contentType: 'application/json',
+                        processData: false,
+                        success: function (response) {
+                            if (response == false) {
+                                $(e.target).find("span").text("False");
+                                toastr.error("Blocked");
+                            }
+                            else {
+                                $(e.target).find("span").text("True");
+                                toastr.info("Unblocked");
+                            }
+                        }
+                    })
+                }
+            }
+        })
+    });
+
+    // delete User
+    function deleteUser (id){
+        bootbox.confirm("Delete user?", function (result) {
+            if (result) {
+                $.ajax({
+                    url: "/User/DeleteUser/" + id,
+                    type: "POST",
+                    success: function (result) {
+                        console.log(result);
+                        setTimeout(window.location.href = "/User", 100);
+                        toastr.info("User was deleted");
+                    },
+                    error: function (result) {
+                        toastr.error("Smth wrong");
+                    }
+                });                
+            }
+        });
+    };
+</script>

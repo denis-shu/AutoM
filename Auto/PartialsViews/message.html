@@ -1,0 +1,69 @@
+﻿<div class="content">
+    <div class="content-nav col-sm-12">
+        <div class="navbar navbar-default">
+            <ul class="log-nav nav navbar-nav">
+                <li class="active"><a ng-click="GetMessage()">Messages</a></li>
+                <li><a ng-click="GetLogs()">Log</a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="col-sm-12">
+        <label class="search-label">Filter</label>
+        <div class="search-log search">
+            <input ng-model="senderId" class="search-input" type="text" value="" placeholder="Sender Id" />
+            <a ng-click="SearchSender(senderId)" class="search-btn btn-primary">
+                <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+            </a>
+        </div>
+        <a ng-click="RefreshMessage(pager.totalItems, 1, selectMessageSize, false)" class="refresh btn btn-primary"><i class="glyphicon glyphicon-refresh"></i>Refresh</a>
+        <div class="select pull-right">
+            <label> Page Size: </label>
+            <select class="form-control" ng-change="ChangeMessageSize(pager.totalItems,1, selectMessageSize)" ng-model="selectMessageSize" ng-options="item for item in messagePageSize track by item"></select>
+        </div>
+    </div>
+    <div class="col-sm-12">
+        <table class="table table-hover">
+            <thead class="table-thead">
+                <tr>
+                    <th>Msg Id</th>
+                    <th>Sender&nbsp;Id</th>
+                    <th>Text</th>
+                    <th><a class="sort" ng-click="SortMessageTime(pager.totalItems, 1, selectMessageSize, messageBool)">Time Stamp <i class="glyphicon glyphicon-arrow-down" id="messageArrow"></i></a></th>
+                    <th>Application</th>
+                    <th>Type</th>
+                </tr>
+            </thead>
+            <tbody class="table-tbody">
+                <tr ng-repeat="msg in msgs">
+                    <td>{{msg.MessageId}}</td>
+                    <td class="longText">{{msg.SenderId}}</td>
+                    <td>{{msg.Text}}</td>
+                    <td>{{msg.TimeStamp| Date | date:"dd/MM/yyyy'at'h:mma"}}</td>
+                    <td>{{msg.Application}}</td>
+                    <td>{{msg.MessageType}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="content-footer">
+    <div class="pages col-sm-12">
+        <ul ng-if="pager.pages.length" class="pagination">
+            <li ng-class="{disabled:pager.currentPage === 1}">
+                <a ng-click="SetPage(pager.totalItems, 1, selectMessageSize)">First</a>
+            </li>
+            <li ng-class="{disabled:pager.currentPage === 1}">
+                <a ng-click="SetPage(pager.totalItems, pager.currentPage-1,selectMessageSize)">Previous</a>
+            </li>
+            <li ng-repeat="page in pager.pages" ng-class="{active:pager.currentPage === page}">
+                <a ng-click="SetPage(pager.totalItems, page, selectMessageSize)">{{page}}</a>
+            </li>
+            <li ng-class="{disabled:pager.currentPage === pager.totalPages}">
+                <a ng-click="SetPage(pager.totalItems, pager.currentPage + 1, selectMessageSize)">Next</a>
+            </li>
+            <li ng-class="{disabled:pager.currentPage === pager.totalPages}">
+                <a ng-click="SetPage(pager.totalItems, pager.totalPages, selectMessageSize)">Last</a>
+            </li>
+        </ul>
+    </div>
+</div>    

@@ -1,0 +1,54 @@
+﻿<div class="content-nav col-sm-12">
+    <div class="navbar navbar-default">
+        <ul class="log-nav nav navbar-nav">
+            <li class="active"><a ng-click="GetMessage()">Messages</a></li>
+            <li><a ng-click="GetLogs()">Log</a></li>
+        </ul>
+        <div class="pull-right">
+            <button ng-click="BackToMessage()" class="back btn btn-primary"><i class="glyphicon glyphicon-arrow-left"></i>Back</button>
+        </div>
+    </div>
+</div> 
+<div class="col-sm-12">
+    <table class="table table-hover">
+        <thead class="table-thead">
+            <tr>
+                <th>Msg Id</th>
+                <th>Sender Id</th>
+                <th>Text</th>
+                <th><a class="sort" ng-click="SortSearchData()">Time Stamp <i class="glyphicon glyphicon-arrow-down" id="searchArrow"></i></a></th>
+                <th>Application</th>
+                <th>Type</th>
+            </tr>
+        </thead>
+        <tbody class="table-tbody">
+            <tr ng-repeat="sender in senders">
+                <td>{{sender.MessageId}}</td>
+                <td class="longText">{{sender.SenderId}}</td>
+                <td>{{sender.Text}}</td>
+                <td>{{sender.TimeStamp| date:"dd/MM/yyyy 'at' h:mma"}}</td>
+                <td>{{sender.Application}}</td>
+                <td>{{sender.MessageType}}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<div class="pages col-sm-12">
+    <ul ng-if="senderPager.pages.length" class="pagination">
+        <li ng-class="{disabled:senderPager.currentPage === 1}">
+            <a ng-click="SetSenderPage(1)">First</a>
+        </li>
+        <li ng-class="{disabled:senderPager.currentPage === 1}">
+            <a ng-click="SetSenderPage(senderPager.currentPage-1)">Previous</a>
+        </li>
+        <li ng-repeat="page in senderPager.pages" ng-class="{active:senderPager.currentPage === page}">
+            <a ng-click="SetSenderPage(page)">{{page}}</a>
+        </li>
+        <li ng-class="{disabled:senderPager.currentPage === senderPager.totalPages}">
+            <a ng-click="SetSenderPage(senderPager.currentPage+1)">Next</a>
+        </li>
+        <li ng-class="{disabled:senderPager.currentPage === senderPager.totalPages}">
+            <a ng-click="SetSenderPage(senderPager.totalPages)">Last</a>
+        </li>
+    </ul>
+</div>

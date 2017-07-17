@@ -1,0 +1,168 @@
+﻿@model testAdmin.Models.SubViewModel
+@using testAdmin.Models
+
+@{
+    ViewBag.Title = "Something";
+}
+<div class="container">
+    <div class="navbar">
+        <div class="automate-nav">
+            @Html.ActionLink("Add new subject", "Find", "Home", new { @id = "0" }, new { @class = "add btn btn-primary" })
+            <div class="search form-group">
+                <input class="search-input" type="text" id="searchText" value="" placeholder="Enter search text" />
+                <a class="search-btn btn-primary" onclick="SearchText()">
+                    <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="clearfix"></div>
+    <div class="searchRes"></div>
+    @foreach (var p in Model.Subs)
+    {
+
+        <div class="well" id="@p.Id">
+            <p>
+                <strong>@p.Key - </strong>
+                <span class="pull-left label label-primary">@p.Id</span>
+                @p.Description
+            </p>
+            @if (p.Tags.Count > 0)
+            {
+                <strong>Tags:</strong>
+                foreach (var t in p.Tags)
+                {
+                    @t.Tag1<text>&ensp;</text>
+                }
+            }
+            <div class="properties">
+                @if (p.Properties.Count > 0)
+                {
+                    <strong>Properties</strong>
+                    foreach (var item in p.Properties)
+                    {
+                        @item.Properties<text>&ensp;</text>
+                    }
+                }
+            </div>
+            <div style="text-align:right">
+                @Html.ActionLink("Details", "Find", new { id = @p.Id }, new { @class = "btn btn-default" })
+                <button class="btn btn-danger" onclick="Delete(@p.Id)">Delete</button>
+            </div>
+
+        </div>
+
+    }
+    <div class="pages-wrap">
+        @if (Model.Pager.EndPage > 1)
+        {
+            <ul class="pagination">
+                @if (Model.Pager.CurrentPage > 1)
+                {
+                    <li>
+                        <a href="~/Home/Index?page=1">First</a>
+                    </li>
+                    <li>
+                        <a href="~/Home/Index?page=@(Model.Pager.CurrentPage - 1)">Previous</a>
+                    </li>
+                }
+
+                @for (var page = Model.Pager.StartPage; page <= Model.Pager.EndPage; page++)
+                {
+                    <li class="@(page == Model.Pager.CurrentPage ? "active" : "")">
+                        <a href="~/Home/Index?page=@page">@page</a>
+                    </li>
+                }
+
+                @if (Model.Pager.CurrentPage < Model.Pager.TotalPages)
+                {
+                    <li>
+                        <a href="~/Home/Index?page=@(Model.Pager.CurrentPage + 1)">Next</a>
+                    </li>
+                    <li>
+                        <a href="~/Home/Index?page=@(Model.Pager.TotalPages)">Last</a>
+                    </li>
+                }
+            </ul>
+        }
+    </div>
+    <hr />
+</div>
+<script>
+    function SearchText() {
+        if ($("#searchText").val().trim() == "") {
+            toastr.error("Please enter data");
+            return false;
+        }
+        var text1 = $("#searchText").val();
+
+        $.ajax({
+            url: "/Home/Search",
+            type: "POST",
+            data: JSON.stringify({ text: text1 }),
+            contentType: 'application/json',
+            processData: false,
+            success: function (response) {
+                if (response.length != 0) {
+                    AddSearchResult(response);
+                }
+                else
+                    bootbox.alert("Key not found");
+
+            },
+            error: function () {
+                toastr.error("Smth wrong");
+            }
+
+        });
+
+    }
+
+    function AddSearchResult(result) {
+        var html = '';
+        var ancor = $("#searchRes");
+        ancor.empty();
+        html += '<div class="searchResult container">'
+        html += '<hr>'
+        $.each(result, function (key, item) {
+            html += '<div class="col-sm-4">';
+            html += '<a href=/Home/Find/' + item.Id + '><p>' + item.Key + '</p></a>';
+            html += '</div>'
+            html += '<div class="col-sm-8">'
+            html += '<p>' + item.Description + '</p>';
+            html += '</div>';
+        });
+        html += '<div class="clearfix"></div>'
+        html += '<hr>'
+        html += '</div>'
+        $('.searchRes').html(html);
+        $('#searchText').val("");
+    }
+    //Delete Subject
+    function Delete(id) {
+        bootbox.confirm("Are u sure?", function (result) {
+            var obj = $(this);
+            if (result) {
+                $.ajax({
+                    url: "/Home/Delete/" + id,
+                    data: JSON.stringify(id),
+                    type: "POST",
+                    contentType: "application/json:charset=utf-8",
+                    dataType: "json",
+                    success: function (result) {
+                        $(obj).remove();
+                        setTimeout(location.reload.bind(location), 1000);
+                        toastr.info("Subject was deleted");
+
+                    },
+                    error: function (result) {
+                        toastr.error("Smth wrong");
+                    }
+                });
+            }
+        });
+    }
+   
+
+
+</script>

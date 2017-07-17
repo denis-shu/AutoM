@@ -1,0 +1,79 @@
+﻿<div class="content-nav col-sm-12">
+    <div class="navbar navbar-default">
+        <ul class="log-nav nav navbar-nav">
+            <li><a ng-click="GetMessage()">Messages</a></li>
+            <li class="active"><a ng-click="GetLogs()">Log</a></li>
+        </ul>
+        <div class="pull-right">
+            <button ng-click="BackToLogs()" class="back btn btn-primary"><i class="glyphicon glyphicon-arrow-left"></i>Back</button>
+        </div>
+    </div>
+</div>
+<div class="col-sm-12">
+    <table class="table table-hover">
+        <thead class="table-thead">
+            <tr>
+                <th>Id</th>
+                <th>Text</th>
+                <th>Time Stamp</th>
+                <th>Message Id</th>
+                <th>Level</th>
+                <th>Application</th>
+            </tr>
+        </thead>
+        <tbody class="table-tbody">
+            <tr ng-repeat="log in logsFind">
+                <td>{{log.Id}}</td>
+                <td><a data-toggle="modal" data-target="#myModal" ng-click="GetException(log.Id)">{{log.Text}}</a></td>
+                <td>{{log.TimeStamp | Date | date:"dd/MM/yyyy'at'h:mma"}}</td>
+                <td>{{log.MessageId}}</td>
+                <td>{{log.Level}}</td>
+                <td>{{log.Application}}</td>
+            </tr>
+        </tbody>
+    </table>
+    <div id="myModal" class="modal fade" role="dialog">
+        <div class="modal-exception modal-dialog">
+            <div ng-if="exception.length != 0" class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Exception info</h4>
+                </div>
+                <table class="table table-hover">
+                    <tbody>
+                        <tr>
+                            <td>HResult</td>
+                            <td>{{exception.HResult}}</td>
+                        </tr>
+                        <tr>
+                            <td>HelpLink</td>
+                            <td>{{exception.HelpLink}}</td>
+                        </tr>
+                        <tr>
+                            <td>Message</td>
+                            <td>{{exception.Message}}</td>
+                        </tr>
+                        <tr>
+                            <td>Source</td>
+                            <td>{{exception.Source}}</td>
+                        </tr>
+                        <tr>
+                            <td>StackTrace</td>
+                            <td>{{exception.StackTrace}}</td>
+                        </tr>
+                        <tr>
+                            <td>TargetSite</td>
+                            <td>{{exception.TargetSite}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div ng-if="exception.length == 0" class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">No exception info</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

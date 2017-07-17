@@ -1,0 +1,245 @@
+﻿
+
+
+@model testAdmin.Models.Property
+
+
+@*@using (Html.BeginForm())
+    {*@
+@Html.AntiForgeryToken()
+
+<div class="form form-horizontal">
+    <h4>Property</h4>
+    <hr />
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+    @Html.HiddenFor(model => model.Id, new { id = "propertyId" })
+    @Html.HiddenFor(m => m.VisualRepresentation_Id, new { id = "vr_id" })
+    @Html.HiddenFor(m => m.Subject_id, new { id = "subId" })
+    <div class="container">
+        <div class="col-sm-12">
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.Properties, htmlAttributes:
+                new { @class = "control-label col-sm-2" })
+                <div class="col-sm-4">
+                    @Html.EditorFor(model => model.Properties,
+                    new { htmlAttributes = new { @class = "form-control", id = "propId" } })
+                    @Html.ValidationMessageFor(model => model.Properties, "",
+                    new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.Description.Description1, htmlAttributes:
+                new { @class = "control-label col-sm-2" })
+                <div class="col-sm-4">
+                    @Html.EditorFor(model => model.Description.Description1,
+                    new { htmlAttributes = new { @class = "form-control", id = "descrId" } })
+                    @Html.ValidationMessageFor(model => model.Description, "",
+                    new { @class = "text-danger" })
+                </div>
+            </div>
+        </div>
+        <div class="clearfix"></div>
+        <hr />
+
+
+        <div class="col-sm-12">
+            <div class="form-group">
+                @Html.LabelFor(model => model.VisualRepresentation.Code,
+                "Visual Representation", htmlAttributes: new { @class = "visual-label control-label col-sm-2" })
+                <div class="col-sm-4">
+                    @Html.TextAreaFor(model => model.VisualRepresentation.Code,
+                    new { htmlAttributes = new { @class = "form-control", id = "visualId" } })
+                    @Html.ValidationMessageFor(model => model.VisualRepresentation.Code, "",
+                    new { @class = "text-danger" })
+                </div>
+            </div>
+            <div class="form-group">
+                <div style="position:relative;">
+                    <label class="control-label col-sm-2">Code Image</label>
+                    <div class="choose-img col-sm-2">
+                        <a href="javascript:" class="choose-img-link">
+                            Choose file...
+                            <input class="choose-img-input" type="file" name="image"
+                                   id="image" multiple="multiple" />
+                        </a>
+                    </div>
+                    <input type="text" name="imageu" id="imageLink" value="" class="img-url form-control col-sm-2" placeholder="Image link" />
+                </div>
+                <div class="clearfix"></div>
+                <div class="visual-footer col-sm-12">
+                    @if ((Model.VisualRepresentation != null) && (Model.VisualRepresentation.Image != null))
+
+                    {
+                        <div class="col-xs-3 col-sm-3">
+                            <img class="image-thumbnail img-responsive" ,
+                                 src="@Url.Action("GetImage", "Subject" , new {id = Model.VisualRepresentation_Id})" />
+
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="control-label col-sm-2" style="margin: 10px 0">No Code Image</div>
+                            <div class="col-sm-1"></div>
+                    }
+                    <div class="buttons-wrap">
+                        <div class="buttons buttons-visual ">
+                            <input id="btnAddVisual" type="button" class="btn btn-info" value="Save new Visual" />
+
+                            @if (Model.VisualRepresentation_Id != 0)
+                            {
+                                <input id="btnDeleteVisual" type="button" class="btn btn-danger" value="Delete Visual"
+                                       onclick="DeleteVisual(@Model.VisualRepresentation_Id)" />
+
+                                        @*@if ((Model.VisualRepresentation != null) && (Model.VisualRepresentation.Image != null))*@
+
+                                        <input id="btnDeleteImage" type="button" class="btn btn-danger" value="Delete Image"
+                                               onclick="DeleteImage(@Model.VisualRepresentation_Id)" />
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="clearfix"></div>
+        <hr />
+        <div class="form-group">
+            <div class="buttons-control col-md-offset-3 col-md-6">
+                <button class="btn btn-info btn-lg" onclick="SaveProperty()">Save</button>
+                @if (Model != null)
+                {
+                    <button class="btn btn-danger btn-lg" onclick="DeleteProperty(@Model.Id)">Delete</button>
+
+                }
+                @Html.ActionLink("Back", "Find", "Home", new { id = Model.Subject_id }, new { @class = "btn btn-default btn-lg" })
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}
+<script>
+    var isAdded = true;
+    var subjectId;
+    //Add Visual object
+    $(document).ready(function () {
+        $("#btnAddVisual").click(function () {
+            var codeArr = document.getElementById('VisualRepresentation_Code').value;
+            var link = $("#imageLink").val();
+            var file = $("#image").get(0).files;
+            var data = new FormData;
+            data.append("Image", file[0]);
+            data.append("Code", codeArr);
+            data.append("Id", $("#vr_id").val());
+            data.append("ImageLink", link);
+
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("Upload", "Subject")",
+                data: data,
+                dataType: "json",
+                cache: false,
+                contentType: false,
+                processData: false,
+                success: function (response) {
+                    $("#vr_id").val(response.Id);
+                    
+                    toastr.success("Success");
+                },
+                error: function (response) {
+                    toastr.info("Smthg wrong");
+                }
+
+            });
+        });
+
+    });
+
+    //Upload image by link
+    $("#imageLink").change(function () {
+        var url = $("#imageLink").val();
+        url_validate = /(ftp|http|https):\/\/(\w+:{0,1}\w*@@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@@!\-\/]))?/;
+        if (!url_validate.test(url)) {
+            bootbox.alert('Enter a valid link');
+        }
+
+    });
+
+    //Delete Visual object
+    function DeleteVisual(id) {
+        if (id == null) {
+            toastr.info("VisualRepresentation doesnt exist");
+            return;
+        }
+        bootbox.confirm("Please confirm deletion", function (result) {
+            if (result) {
+                $.ajax({
+                    url: "/Subject/DeleteVisual/" + id,
+                    data: JSON.stringify(id),
+                    type: "POST",
+                    contentType: "application/json:charset=utf-8",
+                    dataType: "json",
+                    success: function (response) {
+                        $("#vr_id").val(null);
+                        location.reload();
+                        toastr.success("VisualRepresentation model was deleted");
+                    },
+                    error: function (response) {
+                        toastr.error("Smth wrong");
+                    }
+
+                });
+            }
+        });
+
+    }
+
+    //Delete Visual image
+    function DeleteImage(id) {
+        if (id == null) {
+            toastr.info("Image doesnt exist");
+            return;
+        }
+        bootbox.confirm("Please confirm deletion", function (result) {
+            if (result) {
+                $.ajax({
+                    url: "/Subject/DeleteImage/" + id,
+                    data: JSON.stringify(id),
+                    type: "POST",
+                    contentType: "application/json:charset=utf-8",
+                    dataType: "json",
+                    success: function (response) {
+                        toastr.success("Code image has been deleted");
+                        location.reload();
+                    },
+                    error: function (response) {
+                        toastr.error("Smth wrong");
+                    }
+
+                });
+            }
+        });
+    }
+
+
+    function isValid() {
+        var isValid = true;
+        if ($('#propId').val().trim() == "") {
+            $('#propId').css('border-color', 'Red');
+            isValid = false;
+        }
+        else {
+            $('#propId').css('border-color', 'lightgrey');
+        }       
+
+
+        return isValid;
+    }
+
+
+</script>

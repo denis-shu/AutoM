@@ -1,0 +1,191 @@
+﻿@model Logs.Models.UserViewModel
+@using testAdmin.Models
+@{
+    ViewBag.Title = "User's Control";
+}
+
+<div class="content container">
+    <div class="col-sm-12">
+        <div class="col-sm-6" style="padding: 0;">
+            <h2 style="margin:10px 0;"> Список пользователей&nbsp;:</h2>
+        </div>
+        <div class="search form-group">
+            <input class="search-input" type="text" id="searchUser" value="" placeholder="Enter search login" />
+            <a class="search-btn btn-primary" onclick="SearchUser()">
+                <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+            </a>
+        </div>
+    </div>
+    <div class="clearfix"></div>
+    <div class="searchRes col-sm-12">
+    </div>
+    <hr />
+    <div class="col-sm-12">
+
+        <table class="table table-hover">
+            <thead class="table-thead">
+                <tr>
+                    <th>Id</th>
+                    <th>Login</th>
+                    <th>Autentification</th>
+                    <th>Details</th>
+                </tr>
+            </thead>
+            <tbody class="table-tbody">
+              @foreach (var p in Model.Users)
+              {
+                  <tr>
+                      <td>@p.Id</td>
+                      <td>
+                      @Html.ActionLink(@p.Login.ToString(), "GetDetails", new { id = @p.Id, IsAuthenticated = @p.IsAuthenticated })</td>
+                      <td>          
+                        <div class="switch">
+                            <div class="switch-circle">
+                                <span class="switch-value" style="display:none">@p.IsAuthenticated</span>
+                                <i class="switch-id" style="display:none">@p.Id</i>
+                            </div>                        
+                        </div>
+                      </td>
+                      <td>@Html.ActionLink("More", "GetDetails", new { id = @p.Id, IsAuthenticated = @p.IsAuthenticated}, new { @class = "btn btn-default" })</td>
+                  </tr>
+              }
+            </tbody>
+        </table>           
+    </div>
+</div>
+
+<div class="content-footer">
+    <div class="pages-wrap">
+        @if (Model.Pager.EndPage > 1)
+        {
+            <ul class="pagination">
+                @if (Model.Pager.CurrentPage > 1)
+                {
+                    <li>
+                        <a href="~/User/Index?page=1">First</a>
+                    </li>
+                    <li>
+                        <a href="~/User/Index?page=@(Model.Pager.CurrentPage - 1)">Previous</a>
+                    </li>
+                }
+
+                @for (var page = Model.Pager.StartPage; page <= Model.Pager.EndPage; page++)
+                {
+                    <li class="@(page == Model.Pager.CurrentPage ? "active" : "")">
+                        <a href="~/User/Index?page=@page">@page</a>
+                    </li>
+                }
+
+                @if (Model.Pager.CurrentPage < Model.Pager.TotalPages)
+                {
+                    <li>
+                        <a href="~/User/Index?page=@(Model.Pager.CurrentPage + 1)">Next</a>
+                    </li>
+                    <li>
+                        <a href="~/User/Index?page=@(Model.Pager.TotalPages)">Last</a>
+                    </li>
+                }
+            </ul>
+        }
+    </div>
+</div> 
+
+<script type="text/javascript">
+    // switchers
+    function AddSwitcher() {
+        var arr = $(".switch-value");
+        for (var i = 0; i < arr.length; i++) {
+            if ($(arr[i]).text().toLowerCase() == "true") {
+                $(arr[i]).parent().parent().addClass("switch-on");
+            }
+            else
+                $(arr[i]).parent().parent().addClass("switch-off");
+        }
+    };
+
+    AddSwitcher();
+
+    // change switchers
+    $(document).on("click", ".switch", function (e) {
+        bootbox.confirm("Are u sure?", function (result) {
+            if (result) {
+                var temp = $(e.target).find("i").text();
+
+                if ($(e.target).find("div").is(':animated')) {
+                    e.preventDefault();
+                }
+
+                else {
+                    $.ajax({
+                        url: "/User/ChangeAuth/" + temp,
+                        type: "GET",
+                        contentType: 'application/json',
+                        processData: false,
+                        success: function (response) {
+                            if (response == false) {
+                                setTimeout(location.reload.bind(location), 500);
+                                $(e.target).find("span").text("False");                               
+                                toastr.error("Blocked");
+                                $(e.target).find("div").animate({ left: '20px' }, "400");
+                                $(e.target).removeClass("switch-on").addClass("switch-off");
+                            }
+                            else {
+                                setTimeout(location.reload.bind(location), 500);
+                                $(e.target).find("span").text("True");                                
+                                $(e.target).find("div").animate({ left: '-2px' }, "400");
+                                $(e.target).removeClass("switch-off").addClass("switch-on");
+                                toastr.info("Unblocked");
+                            }
+                        }
+                    });
+                }
+            }
+        });
+    });
+
+    // search user
+    function SearchUser() {
+        if ($("#searchUser").val().trim() == "") {
+            toastr.error("Please enter data");
+            return false;
+        }
+        var login1 = $("#searchUser").val().trim();
+
+        $.ajax({
+            url: "/User/SearchUser",
+            type: "POST",
+            data: JSON.stringify({ login: login1 }),
+            contentType: 'application/json',
+            processData: false,
+            success: function (response) {
+                if (response.length != 0) {
+                    AddSearchResult(response);
+
+               }
+                else
+                    bootbox.alert("Key not found");
+
+            },
+            error: function () {
+                toastr.error("Smth wrong");
+            }
+
+        });
+
+    }
+
+
+    // add search result
+    function AddSearchResult(result) {
+        var html = '';
+        var ancor = $("#searchRes");
+        ancor.empty();       
+        html += '<div class="searchResult">'
+        html += '<label class="col-sm-2">Результат поиска: </label>'
+        html += '<a href=/User/GetDetails/' + result.Id + '?IsAuthenticated=' + result.IsAuthenticated + '>' + result.Login + '</a></div>';
+        $('.searchRes').html(html);
+        $('#searchUser').val("");
+        AddSwitcher();
+    }
+
+</script>   
