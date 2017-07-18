@@ -20,9 +20,9 @@ namespace testAdmin.Controllers
 
         #region Index
         //  GET: User        
-        public ActionResult Index(int page = 1)
+        public async Task<ActionResult> Index(int page = 1)
         {
-            var model = _context.GetUsers(page);
+            var model = await _context.GetUsers(page);
 
             return View(model);
         }
